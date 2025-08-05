@@ -147,3 +147,25 @@
   ],
  caption: [結果],
 ) <case4_result>
+
+=== 日付しか明記されていないケース
+要素が不明である場合、"None"とすることにした。
+#linebreak()
+#figure(
+  showybox()[ 
+  {"user": "U021JKQFJUC", "text": "ミーティングの件、いつに設定しましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "7/20はどうでしょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "その日で問題ないと思います！"},
+  #linebreak()
+  ],
+ caption: [応答],
+) <case5_messages>
+#linebreak()
+#figure(
+  showybox()[ 
+  {"date": "2025-07-20", "start_time": "None", "end_time": "None","summary": "ミーティング"}
+  ],
+ caption: [結果],
+) <case5_result>

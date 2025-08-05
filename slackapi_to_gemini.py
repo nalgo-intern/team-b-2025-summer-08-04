@@ -1,17 +1,18 @@
 import json
-from config import path_slack_history,path_translated_data,path_gemini_api_key,path_prompt_format,path_gemini_response
+from config import path_extracted_data,path_gemini_api_key,path_prompt_format,path_gemini_response
 import google.generativeai as genai
+import datetime
+
+#年を取得
+today = datetime.date.today()
+year = str(today.year)
 
 # slackbotからのJSONファイルを読み込む
-with open(f'{path_slack_history}', encoding='utf-8') as f:
-    raw_data = json.load(f)
+with open(f'{path_extracted_data}', encoding='utf-8') as f:
+    extracted_data = json.load(f)
 
 # オブジェクトごとに改行
-translated_data = json.dumps(raw_data, ensure_ascii=False).replace('}, {', '},\n{')
-
-# translated_dataをjsonファイルに保存
-with open(f'{path_translated_data}', 'w', encoding='utf-8') as f:
-    f.write(translated_data)
+translated_data = json.dumps(extracted_data, ensure_ascii=False).replace('}, {', '},\n{')
 
 # 内容を表示
 print('translated_data = ')
@@ -26,18 +27,18 @@ try:
     # geminiに投げるプロンプトのフォーマットを読み込む
     with open(f'{path_prompt_format}', 'r', encoding='utf-8') as f:
         prompt_format = f.read()
-    
-    with open(f'{path_translated_data}', encoding='utf-8') as f:
-        prompt_messages = json.load(f)
 
+    prompt = (f'{prompt_format}\n' +  
+              f'また、年に関する情報がない場合、年は{year}に設定してください。\n\n' +
+              f'{translated_data}' )
+    
     # Geminiにプロンプトを送信して応答を生成
-    response = model.generate_content(
-        f"{prompt_format}\n"+  
-        f"{prompt_messages}"
-        )
+    response = model.generate_content(prompt)
+    #プロンプトの内容を表示
+    print('\n\nprompt= \n' +  f'{prompt}')
 
     # 応答のテキスト部分を表示
-    print('\nresponse= ' +  f'{response.text}')
+    print('\n\nresponse= \n' +  f'{response.text}')
 
     # 応答をjsonに保存
     with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
@@ -50,13 +51,10 @@ except Exception as e:
 
 
 # jsonファイルの内容を空リストで上書きして削除
-with open(f'{path_translated_data}', 'w', encoding='utf-8') as f:
+with open(f'{path_extracted_data}', 'w', encoding='utf-8') as f:
     json.dump([], f, ensure_ascii=False)
 
-with open(f'{path_slack_history}', 'w', encoding='utf-8') as f:
-    json.dump([], f, ensure_ascii=False)
 
-"""
 with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
     json.dump([], f, ensure_ascii=False)
-"""
+    
