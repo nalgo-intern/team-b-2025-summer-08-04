@@ -1,0 +1,68 @@
+{
+	"ok": true,
+	"messages": [
+		{
+			"client_msg_id": "93e971cf-d7a3-498c-8280-2ac09f3a10a8",
+			"type": "message",
+			"text": "じゃあ、7/20の15:00から1時間、会議を設定しますね。",
+			"user": "U021JKQFJUC",
+			"ts": "1622007981.001400",
+			"team": "T021R3N359P",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"block_id": "en=++",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "テスト！"
+								}
+							]
+						}
+					]
+				}
+			],
+			"thread_ts": "1622007981.001400",
+			"reply_count": 1,
+			"reply_users_count": 1,
+			"latest_reply": "1622007986.001500",
+			"reply_users": [
+				"U021JKQFJUC"
+			],
+			"is_locked": false,
+			"subscribed": false
+		},
+		{
+			"client_msg_id": "4d50d26c-554f-4788-afda-f93941b646f4",
+			"type": "message",
+			"text": "わかりました！",
+			"user": "U021JKQFJUD",
+			"ts": "1622007986.001500",
+			"team": "T021R3N359P",
+			"blocks": [
+				{
+					"type": "rich_text",
+					"block_id": "SZJ",
+					"elements": [
+						{
+							"type": "rich_text_section",
+							"elements": [
+								{
+									"type": "text",
+									"text": "いいね"
+								}
+							]
+						}
+					]
+				}
+			],
+			"thread_ts": "1622007981.001400",
+			"parent_user_id": "U021JKQFJUC"
+		}
+	],
+	"has_more": false
+}
+ 

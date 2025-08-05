@@ -1,0 +1,10 @@
+tasks
+1.生のjsonデータからユーザIDと発言内容を抽出
+2.抽出した内容をgeminiに投げて、日付、日時、要件を抽出する(format→prompt_format.txt)
+3.出力された回答から、日付、日時、要件を抽出する
+4.抽出された情報を、json形式に変換する
+
+assignment
+・年に関する情報がない場合が多いと想定される
+1.slackAPI側から持っていけるか？
+2.google calenderがその曖昧さも対応しているか？
