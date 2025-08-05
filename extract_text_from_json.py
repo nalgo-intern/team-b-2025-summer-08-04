@@ -1,6 +1,7 @@
 import json
+from config import path_slack_history
 
-with open('Sample_history.json', encoding='utf-8') as f:
+with open(f'{path_slack_history}', encoding='utf-8') as f:
     data = json.load(f)
 
 results = []

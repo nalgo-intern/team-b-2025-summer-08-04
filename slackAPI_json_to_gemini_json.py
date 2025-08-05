@@ -1,7 +1,8 @@
 import json
+from config import path_extract_messages
 
 # extract.jsonの内容を読み込む
-with open('extract.json', encoding='utf-8') as f:
+with open(f'{path_extract_messages}', encoding='utf-8') as f:
     data = json.load(f)
 
 print(data)  # 内容を表示

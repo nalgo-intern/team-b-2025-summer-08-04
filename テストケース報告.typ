@@ -37,7 +37,7 @@
 }
 
 = テストケース報告
-== 最も単純なケース
+== 会話内容が最も単純なケース
 #linebreak()
 #figure(
   showybox()[ 
@@ -55,7 +55,7 @@
  caption: [結果],
 ) <case1_result>
 
-== 少し複雑なケース
+== 会話内容が少し複雑なケース
 #linebreak()
 #figure(
   showybox()[ 
@@ -75,11 +75,75 @@
   #linebreak()
   ],
  caption: [応答],
-) <case1_messages>
+) <case2_messages>
 #linebreak()
 #figure(
   showybox()[ 
   {"date": "2024-07-20", "start_time": "17:00", "end_time": "18:00","summary": "会議"}
   ],
  caption: [結果],
-) <case1_result>
+) <case2_result>
+
+#pagebreak()
+
+== 会話で議論が行われているケース
+時刻について議論が行われている場合でも、最終的に合意された日時を抽出することができた。
+#linebreak()
+#figure(
+  showybox()[ 
+  {"user": "U021JKQFJUC", "text": "ミーティングの件、いつに設定しましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "7/20はどうでしょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "その日で問題ないと思います！"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "承知しました。何時開始にしましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUA", "text": "今日の午後1時ごろからなら空いているので、それ以降ならいつでも問題ないです!"},
+  #linebreak()
+  {"user": "U021JKQFJUB", "text": "13:00からだと予定が合わないですね...私は2時ごろからなら空いています"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "では、二時半から一時間で、会議を設定しますね。"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "承知しました。"}
+  #linebreak()
+  ],
+ caption: [応答],
+) <case3_messages>
+#linebreak()
+#figure(
+  showybox()[ 
+  {"date": "2024-07-20", "start_time": "14:30", "end_time": "15:30","summary": "会議"}
+  ],
+ caption: [結果],
+) <case3_result>
+
+== 会話内容に予定の終了時刻が明記されていないケース
+終了時刻が明記されていない場合、"None"とすることにした。
+#linebreak()
+#figure(
+  showybox()[ 
+  {"user": "U021JKQFJUC", "text": "ミーティングの件、いつに設定しましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "7/20はどうでしょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "その日で問題ないと思います！"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "承知しました。何時開始にしましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "今日の15:00ごろからなら空いているので、それ以降ならいつでも問題ないです!"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "では、15:00からの会議を設定しますね。"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "承知しました。"}
+  #linebreak()
+  ],
+ caption: [応答],
+) <case4_messages>
+#linebreak()
+#figure(
+  showybox()[ 
+  {"date": "2024-07-20", "start_time": "17:00", "end_time": "None","summary": "会議"}
+  ],
+ caption: [結果],
+) <case4_result>
