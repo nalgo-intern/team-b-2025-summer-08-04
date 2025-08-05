@@ -1,36 +1,22 @@
 import json
-from config import path_slack_history,path_extract_messages,path_gemini_api_key,path_prompt_format
+from config import path_slack_history,path_translated_data,path_gemini_api_key,path_prompt_format,path_gemini_response
 import google.generativeai as genai
 
-# slackapiからのJSONファイルを読み込み、ユーザーIDとテキストを抽出
+# slackbotからのJSONファイルを読み込む
 with open(f'{path_slack_history}', encoding='utf-8') as f:
-    data = json.load(f)
-
-results = []
-for msg in data.get('messages', []):
-    user = msg.get('user')
-    text = msg.get('text')
-    if user and text:
-        results.append({'user': user, 'text': text})
+    raw_data = json.load(f)
 
 # オブジェクトごとに改行
-json_string = json.dumps(results, ensure_ascii=False).replace('}, {', '},\n{')
+translated_data = json.dumps(raw_data, ensure_ascii=False).replace('}, {', '},\n{')
 
-with open('extract.json', 'w', encoding='utf-8') as f:
-    f.write(json_string)
+# translated_dataをjsonファイルに保存
+with open(f'{path_translated_data}', 'w', encoding='utf-8') as f:
+    f.write(translated_data)
 
+# 内容を表示
+print('translated_data = ')
+print(translated_data)
 
-# extract.jsonの内容を読み込む
-with open(f'{path_extract_messages}', encoding='utf-8') as f:
-    data = json.load(f)
-
-print(data)  # 内容を表示
-
-"""
-# extract.jsonの内容を空リストで上書きして削除
-with open('extract.json', 'w', encoding='utf-8') as f:
-    json.dump([], f, ensure_ascii=False, indent=2)
-"""
 
 # geminiの初期設定
 genai.configure(api_key=path_gemini_api_key)
@@ -41,7 +27,7 @@ try:
     with open(f'{path_prompt_format}', 'r', encoding='utf-8') as f:
         prompt_format = f.read()
     
-    with open(f'{path_extract_messages}', encoding='utf-8') as f:
+    with open(f'{path_translated_data}', encoding='utf-8') as f:
         prompt_messages = json.load(f)
 
     # Geminiにプロンプトを送信して応答を生成
@@ -51,13 +37,26 @@ try:
         )
 
     # 応答のテキスト部分を表示
-    print(response.text)
+    print('\nresponse= ' +  f'{response.text}')
 
-    # 応答をgemini_responce.jsonに保存
-    with open('gemini_responce.json', 'w', encoding='utf-8') as f:
+    # 応答をjsonに保存
+    with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
         f.write(response.text)
 
 except FileNotFoundError:
     print("エラー: ファイルが見つかりません。")
 except Exception as e:
     print(f"API呼び出し中にエラーが発生しました: {e}")
+
+
+# jsonファイルの内容を空リストで上書きして削除
+with open(f'{path_translated_data}', 'w', encoding='utf-8') as f:
+    json.dump([], f, ensure_ascii=False)
+
+with open(f'{path_slack_history}', 'w', encoding='utf-8') as f:
+    json.dump([], f, ensure_ascii=False)
+
+"""
+with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
+    json.dump([], f, ensure_ascii=False)
+"""

@@ -1,2 +1,7 @@
-・python 3.11.13
-(conda activate 3.11.13)
+色々とありますが、ここに書いてあるものしか関係ないです。(congfigの中パスが書いてあるファイルは関係あります)
+
+・config.py
+apiキーやファイルパスなどを格納している
+
+・slackapi_to_gemini.py 
+slackbotから送られてきたjsonファイルをもとに、geminiに送信し、予定の内容についてgemini_responceに出力する。
