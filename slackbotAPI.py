@@ -1,7 +1,10 @@
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import os
+import json
+from config import path_extracted_data, path_gemini_response
 from dotenv import load_dotenv
+from slackapi_to_gemini import gemini_api
 
 #.envファイルから環境変数を読み込む
 load_dotenv()
@@ -85,13 +88,17 @@ def handle_message_events(body, say, logger):
     message_baffer.append(message_json)
     #バッファの長さを参照し、長さが10以上なら出力し、バッファリセット
     #このコードでは、say(text=f"メッセージ内容:{message_baffer}")　でslackのチャンネルにメッセージ内容を送信しているため、この部分をgeminiに送信するコードに変更してください。
-    if len(message_baffer) >= 4:
-        # llm_data = llmからもらうdataの関数()
-        llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "会議"}
-        # llm_data = {"date": "None", "start_time": "15:00", "end_time": "None","summary": "会議"}
-        # llm_data = {"date": "2024-07-20", "start_time": "None", "end_time": "None","summary": "会議"}
-        # llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "None"}
-        # llm_data = {"date": "None", "start_time": "None", "end_time": "None","summary": "None"}
+    if len(message_baffer) >= 10:
+        # extract.jsonに会話内容の保存を行う
+        with open(f'{path_extracted_data}', 'w', encoding='utf-8') as f:
+            json.dump(message_baffer, f, ensure_ascii=False)
+            
+        gemini_api() # ジェミニを動かす
+        
+        # ジェミニの出力を受け取る
+        with open(path_gemini_response, "r", encoding="utf-8") as f:
+            llm_data = json.load(f)
+
         chack, send_txt = chack_data(llm_data)
         if chack:
             say(text=send_txt)
