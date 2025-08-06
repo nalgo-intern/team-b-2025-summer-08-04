@@ -15,6 +15,9 @@ app = App(token=SLACK_BOT_TOKEN)
 #json形式のメッセージを溜めるためのリスト
 message_baffer = []
 
+#起動時にBotのユーザーIDを取得
+bot_user_id = app.client.auth_test()["user_id"]
+
 def chack_data(llm_data:dict):
     """LLMから受け取ったデータが条件を満たしているのか確認し
     満たしているときにslackに送るtxtを作成する関数"""
@@ -84,8 +87,8 @@ def handle_message_events(body, say, logger):
     #このコードでは、say(text=f"メッセージ内容:{message_baffer}")　でslackのチャンネルにメッセージ内容を送信しているため、この部分をgeminiに送信するコードに変更してください。
     if len(message_baffer) >= 4:
         # llm_data = llmからもらうdataの関数()
-        # llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "会議"}
-        llm_data = {"date": "None", "start_time": "15:00", "end_time": "None","summary": "会議"}
+        llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "会議"}
+        # llm_data = {"date": "None", "start_time": "15:00", "end_time": "None","summary": "会議"}
         # llm_data = {"date": "2024-07-20", "start_time": "None", "end_time": "None","summary": "会議"}
         # llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "None"}
         # llm_data = {"date": "None", "start_time": "None", "end_time": "None","summary": "None"}
@@ -93,6 +96,26 @@ def handle_message_events(body, say, logger):
         if chack:
             say(text=send_txt)
         message_baffer.clear()
+
+#リアクションされたときの処理(リアクションユーザー判断、メールアドレス取得)
+@app.event("reaction_added")
+def handle_reaction(event,say,logger):
+    user_id = event.get("user")               # リアクションをしたユーザー
+    reaction = event.get("reaction")          # 使用されたリアクション
+    item_user = event.get("item_user")        # リアクション対象メッセージの送信者
+    
+    print("reaction:",reaction)
+    print("type:",type(reaction))
+    #Botが送ったメッセージに対するリアクションかを確認
+    if item_user == bot_user_id:
+        if reaction in ["o","+1"]: #特定のリアクションのみ対象にする
+            try:
+                #ユーザー情報の取得
+                user_info = app.client.users_info(user=user_id)
+                email = user_info["user"]["profile"].get("email","(取得不可)")
+                say(text=f"リアクションユーザーのメール: {email}")
+            except Exception as e:
+                say(text=f"❌ メール取得失敗: {e}")
         
         
 if __name__ == "__main__":
