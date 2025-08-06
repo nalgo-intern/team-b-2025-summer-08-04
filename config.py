@@ -1,0 +1,5 @@
+path_gemini_api_key = "AIzaSyCeoPw7uJliuxLVlzwNHI5mWRAEaxtONIo"
+path_slack_history = "sample_history.json"
+path_extracted_data = "extract.json"
+path_prompt_format = "prompt_format.txt"
+path_gemini_response = "gemini_response.json"
