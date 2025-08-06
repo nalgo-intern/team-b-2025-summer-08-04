@@ -41,7 +41,7 @@ def chack_data(llm_data:dict):
     if summary != "None":
         data_chack[2] = 1
         send_txt += f"予定内容：{summary}\n"
-        send_txt += f"これでよろしければスタンプを押してください"
+        send_txt += f"これでよろしければスタンプ( :+1: もしくは :o: )を押してください"
         
     if sum(data_chack) == 2:
         if not data_chack[0]:
