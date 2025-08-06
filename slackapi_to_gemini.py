@@ -5,7 +5,13 @@ import datetime
 
 #年を取得
 today = datetime.date.today()
-year = str(today.year)
+year = today.year
+str_year = str(year)
+
+#曜日を取得
+w_list = ['月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日', '日曜日']
+d = datetime.date(year, today.month, today.day)
+weekday = w_list[d.weekday()]
 
 # slackbotからのJSONファイルを読み込む
 with open(f'{path_extracted_data}', encoding='utf-8') as f:
@@ -29,7 +35,8 @@ try:
         prompt_format = f.read()
 
     prompt = (f'{prompt_format}\n' +  
-              f'また、年に関する情報がない場合、年は{year}に設定してください。\n\n' +
+              f'また、年に関する情報がない場合、年は{str_year}に設定してください。\n' +
+              f'また、今日の日付は{year}年{today.month}月{today.day}日で、曜日は{weekday}です。\n\n' +
               f'{translated_data}' )
     
     # Geminiにプロンプトを送信して応答を生成

@@ -117,9 +117,11 @@
   ],
  caption: [結果],
 ) <case3_result>
+#pagebreak()
 
-== 会話内容に予定の終了時刻が明記されていないケース
-終了時刻が明記されていない場合、"None"とすることにした。
+== 会話内容があいまいなケース
+=== 会話内容に予定の終了時刻が明記されていないケース
+特定の要素が不明である場合、"None"とすることにした。
 #linebreak()
 #figure(
   showybox()[ 
@@ -149,7 +151,7 @@
 ) <case4_result>
 
 === 日付しか明記されていないケース
-要素が不明である場合、"None"とすることにした。
+特定の要素が不明である場合、"None"とすることにした。
 #linebreak()
 #figure(
   showybox()[ 
@@ -169,3 +171,36 @@
   ],
  caption: [結果],
 ) <case5_result>
+
+=== 会話内容に具体的な日付が明記されていないケース
+gemini側に伝えるプロンプトに、今日の日付と曜日を記載することで、推測を行えるようにした。その結果、2025/08/06(水)に議論された、\n
+今週の金曜日の15:00から会議\n
+というあいまいな内容から、
+2025/08/08(金)の15:00から会議\n
+という内容を設定することができた。
+#linebreak()
+#figure(
+  showybox()[ 
+  {"user": "U021JKQFJUC", "text": "ミーティングの件、いつに設定しましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "今週の金曜日はどうでしょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "その日で問題ないと思います！"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "承知しました。何時開始にしましょうか？"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "今日の15:00ごろからなら空いているので、それ以降ならいつでも問題ないです!"},
+  #linebreak()
+  {"user": "U021JKQFJUD", "text": "では、15:00からの会議を設定しますね。"},
+  #linebreak()
+  {"user": "U021JKQFJUC", "text": "承知しました。"}
+  ],
+ caption: [応答],
+) <case6_messages>
+#linebreak()
+#figure(
+  showybox()[ 
+  {"date": "2025-08-08", "start_time": "15:00", "end_time": "None","summary": "会議"}
+  ],
+ caption: [結果],
+) <case6_result>
