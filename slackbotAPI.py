@@ -24,31 +24,35 @@ def chack_data(llm_data:dict):
     end_time = llm_data["end_time"]
     summary = llm_data["summary"]
     send_txt = ""
-    data_count = 0
+    data_chack = [0, 0, 0] # どのデータがあるかを確認するためのlist(dateがある場合:data_chack[0]=1, start_timeがある場合:data_chack[1]=1, summaryがある場合:data_chack[2]=1)
     chack = True # LLMから送られてきたデータが正しいか判定する変数
     
-    if date != None:
-        data_count += 1
-        send_txt += f"日時：{date}\n"
-        
-    if start_time != None:
-        data_count += 1
+    if date != "None":
+        data_chack[0] = 1
+        send_txt += f"日程：{date}\n"
+    if start_time != "None":
+        data_chack[1] = 1
         send_txt += f"開始時間：{start_time}\n"
-    
-    if end_time != None:
+    if end_time != "None":
         send_txt += f"終了時間：{end_time}\n"
+    if summary != "None":
+        data_chack[2] = 1
+        send_txt += f"予定内容：{summary}\n"
+        send_txt += f"これでよろしければスタンプを押してください"
         
-    if summary != None:
-        data_count += 1
-        send_txt += f"内容：{summary}\n"
-    
-    if data_count < 3:
+    if sum(data_chack) == 2:
+        if not data_chack[0]:
+            send_txt = f"「日程」の情報を追加してください"
+        elif not data_chack[1]:
+            send_txt = f"「開始時間」の情報を追加してください"
+        else:
+            send_txt = f"「予定内容」の情報を追加してください"
+
+    if sum(data_chack) < 2:
         chack = False
-        
+            
     return chack, send_txt
-        
-        
-    
+
 
 # メッセージ受信イベント（プライベートチャンネル対応）
 @app.event("message")
@@ -76,11 +80,15 @@ def handle_message_events(body, say, logger):
 
     #バッファに蓄積
     message_baffer.append(message_json)
-
     #バッファの長さを参照し、長さが10以上なら出力し、バッファリセット
     #このコードでは、say(text=f"メッセージ内容:{message_baffer}")　でslackのチャンネルにメッセージ内容を送信しているため、この部分をgeminiに送信するコードに変更してください。
-    if len(message_baffer) >= 10:
-        llm_data = llmからもらうdataの関数()
+    if len(message_baffer) >= 4:
+        # llm_data = llmからもらうdataの関数()
+        # llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "会議"}
+        llm_data = {"date": "None", "start_time": "15:00", "end_time": "None","summary": "会議"}
+        # llm_data = {"date": "2024-07-20", "start_time": "None", "end_time": "None","summary": "会議"}
+        # llm_data = {"date": "2024-07-20", "start_time": "15:00", "end_time": "None","summary": "None"}
+        # llm_data = {"date": "None", "start_time": "None", "end_time": "None","summary": "None"}
         chack, send_txt = chack_data(llm_data)
         if chack:
             say(text=send_txt)
