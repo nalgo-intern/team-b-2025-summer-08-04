@@ -68,6 +68,10 @@ def check_data(llm_data:dict):
 def handle_message_events(body, say, logger):
     global buffer_count
     event = body.get("event",{})
+    
+    # ジェミニの出力を初期化する
+    with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
+        json.dump([], f, ensure_ascii=False)
 
     #他BOTやシステムメッセージを無視
     if event.get("subtype"):
@@ -127,9 +131,6 @@ def handle_message_events(body, say, logger):
                 timestamp=target_ts
             )
                 
-        # ジェミニの出力を初期化する
-        with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
-            json.dump([], f, ensure_ascii=False)
             
         # else:
         #     if data_count == 2:
@@ -159,6 +160,7 @@ def handle_reaction(event,say,logger):
                 say(text=f"リアクションユーザーのメール: {email}")
             except Exception as e:
                 say(text=f"❌ メール取得失敗: {e}")
+            message_baffer.clear()
         
         
 if __name__ == "__main__":
