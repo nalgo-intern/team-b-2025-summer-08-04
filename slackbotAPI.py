@@ -5,6 +5,7 @@ import json
 from config import path_extracted_data, path_gemini_response
 from dotenv import load_dotenv
 from slackapi_to_gemini import gemini_api
+from share_event import share_event_to_user
 
 #.envファイルから環境変数を読み込む
 load_dotenv()
@@ -158,6 +159,7 @@ def handle_reaction(event,say,logger):
                 user_info = app.client.users_info(user=user_id)
                 email = user_info["user"]["profile"].get("email","(取得不可)")
                 say(text=f"リアクションユーザーのメール: {email}")
+                share_event_to_user(str(email))
             except Exception as e:
                 say(text=f"❌ メール取得失敗: {e}")
             message_baffer.clear()
