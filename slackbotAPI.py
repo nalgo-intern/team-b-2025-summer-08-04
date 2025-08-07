@@ -2,6 +2,8 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import os
 from dotenv import load_dotenv
+from share_event import share_event_to_user
+import json
 
 #.envファイルから環境変数を読み込む
 load_dotenv()
@@ -42,7 +44,7 @@ def chack_data(llm_data:dict):
     if summary != "None":
         data_chack[2] = 1
         send_txt += f"予定内容：{summary}\n"
-        send_txt += f"これでよろしければスタンプ( :+1: もしくは :o: )を押してください"
+        send_txt += f"これでよろしければスタンプ( :o: )を押してください"
         
     if sum(data_chack) == 2:
         if not data_chack[0]:
@@ -74,9 +76,6 @@ def handle_message_events(body, say, logger):
     #イベントが発生したチャンネルIDの取得
     channel_id = event["channel"]
 
-    # print("channel:",channel_id)
-    # print("ts:",ts)
-
     #ユーザーIDとメッセージ内容の取得でランタイムエラーが起きた場合
     if not user_id or not text:
         return
@@ -104,12 +103,12 @@ def handle_message_events(body, say, logger):
                 text=send_txt
                 )
             target_ts = response["ts"]
-            for emoji in ["+1","o"]:
-                app.client.reactions_add(
-                    channel=channel_id,
-                    name=emoji,
-                    timestamp=target_ts
-                )
+            
+            app.client.reactions_add(
+                channel=channel_id,
+                name="o",
+                timestamp=target_ts
+            )
         message_baffer.clear()
 
 #リアクションされたときの処理(リアクションユーザー判断、メールアドレス取得)
@@ -125,12 +124,13 @@ def handle_reaction(event,say,logger):
 
     #Botが送ったメッセージに対するリアクションかを確認
     if item_user == bot_user_id:
-        if reaction in ["o","+1"]: #特定のリアクションのみ対象にする
+        if reaction in ["o"]: #特定のリアクションのみ対象にする
             try:
                 #ユーザー情報の取得
                 user_info = app.client.users_info(user=user_id)
                 email = user_info["user"]["profile"].get("email","(取得不可)")
                 say(text=f"リアクションユーザーのメール: {email}")
+                share_event_to_user(str(email))
             except Exception as e:
                 say(text=f"❌ メール取得失敗: {e}")
 
