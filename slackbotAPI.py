@@ -17,7 +17,7 @@ app = App(token=SLACK_BOT_TOKEN)
 
 #json形式のメッセージを溜めるためのリスト
 message_baffer = []
-# baffer_count = 0
+buffer_count = 0
 
 #起動時にBotのユーザーIDを取得
 bot_user_id = app.client.auth_test()["user_id"]
@@ -47,17 +47,17 @@ def check_data(llm_data:dict):
         data_chack[2] = 1
         # send_txt += f"これでよろしければスタンプ( :+1: もしくは :o: )を押してください"
         
-    if sum(data_chack) == 2:
-        check = False
-        send_txt += f"現在の予定では情報が足りません\n"
-        if not data_chack[0]:
-            send_txt += f"「日程」の情報を追加してください"
-        elif not data_chack[1]:
-            send_txt += f"「開始時間」の情報を追加してください"
-        else:
-            send_txt += f"「予定内容」の情報を追加してください"
+    # if sum(data_chack) == 2:
+    #     check = False
+    #     send_txt += f"現在の予定では情報が足りません\n"
+    #     if not data_chack[0]:
+    #         send_txt += f"「日程」の情報を追加してください"
+    #     elif not data_chack[1]:
+    #         send_txt += f"「開始時間」の情報を追加してください"
+    #     else:
+    #         send_txt += f"「予定内容」の情報を追加してください"
 
-    if sum(data_chack) < 2:
+    if sum(data_chack) < 3:
         check = False
             
     return sum(data_chack), check, send_txt
@@ -66,6 +66,7 @@ def check_data(llm_data:dict):
 # メッセージ受信イベント（プライベートチャンネル対応）
 @app.event("message")
 def handle_message_events(body, say, logger):
+    global buffer_count
     event = body.get("event",{})
 
     #他BOTやシステムメッセージを無視
@@ -83,11 +84,6 @@ def handle_message_events(body, say, logger):
     if not user_id or not text:
         return
     print(f"user:message  {user_id}:{text}")
-    
-    #ユーザーIDとメッセージ内容の取得でランタイムエラーが起きた場合
-    if not user_id or not text:
-        return
-    print(f"user:message  {user_id}:{text}")
 
     #ユーザーIDとメッセージ内容をjson形式に変換
     message_json = {
@@ -97,11 +93,14 @@ def handle_message_events(body, say, logger):
 
     #バッファに蓄積
     message_baffer.append(message_json)
-    # buffer_count += 1
-    
+    buffer_count += 1
+    print(buffer_count)
     #バッファの長さを参照し、長さが10以上なら出力し、バッファリセット
     #このコードでは、say(text=f"メッセージ内容:{message_baffer}")　でslackのチャンネルにメッセージ内容を送信しているため、この部分をgeminiに送信するコードに変更してください。
-    if len(message_baffer) >= 2:
+    if buffer_count >= 2:
+        # baffer_countの初期化
+        buffer_count = 0
+        
         # extract.jsonに会話内容の保存を行う
         with open(f'{path_extracted_data}', 'w', encoding='utf-8') as f:
             json.dump(message_baffer, f, ensure_ascii=False)
@@ -112,25 +111,31 @@ def handle_message_events(body, say, logger):
         with open(path_gemini_response, "r", encoding="utf-8") as f:
             llm_data = json.load(f)
 
+        print(llm_data)
         data_count, check, send_txt = check_data(llm_data)
         if check: # 必要な情報(日程，開始時間，予定内容)がある
-            send_txt += f"これでよろしければリアクション( :+1: もしくは :o: )をしてください"
+            send_txt += f"これでよろしければリアクション( :o: )をしてください"
             response = app.client.chat_postMessage(
                 channel=channel_id,
                 text=send_txt
                 )
             target_ts = response["ts"]
-            for emoji in ["+1","o"]:
-                app.client.reactions_add(
-                    channel=channel_id,
-                    name=emoji,
-                    timestamp=target_ts
-                )
-        else:
-            if data_count == 2:
-                say(text=send_txt)
             
-        message_baffer.clear()
+            app.client.reactions_add(
+                channel=channel_id,
+                name="o",
+                timestamp=target_ts
+            )
+                
+        # ジェミニの出力を初期化する
+        with open(f'{path_gemini_response}', 'w', encoding='utf-8') as f:
+            json.dump([], f, ensure_ascii=False)
+            
+        # else:
+        #     if data_count == 2:
+        #         say(text=send_txt)
+            
+        # message_baffer.clear()
         
 
 #リアクションされたときの処理(リアクションユーザー判断、メールアドレス取得)
@@ -146,7 +151,7 @@ def handle_reaction(event,say,logger):
 
     #Botが送ったメッセージに対するリアクションかを確認
     if item_user == bot_user_id:
-        if reaction in ["o","+1"]: #特定のリアクションのみ対象にする
+        if reaction in ["o"]: #特定のリアクションのみ対象にする
             try:
                 #ユーザー情報の取得
                 user_info = app.client.users_info(user=user_id)
