@@ -7,7 +7,8 @@ from googleapiclient.discovery import build
 # ファイル名の定義
 CONFIG_FILE = 'config.json'         # サービスアカウントの認証情報などの設定ファイル
 MAP_FILE = 'calendar_map.json'      # ユーザーのメールアドレスとカレンダーIDの紐づけを保存するファイル
-SAMPLE_FILE = 'sample.json'         # 予定情報（日時や内容など）を記録したJSONファイル
+SAMPLE_FILE = 'gemini_response.json'         # 予定情報（日時や内容など）を記録したJSONファイル
+# SAMPLE_FILE = 'sample.json'
 
 # 設定ファイルを読み込む関数
 def load_config():
